@@ -263,4 +263,25 @@ ipcHandle("__Luna.preloadErr", async (_, err: Error) => {
 	console.error(err);
 	electron.dialog.showErrorBox("TidaLuna", err.message);
 });
+
+// #region Token Management
+const tokenFilePath = path.join(electron.app.getPath("userData"), "token.json");
+
+ipcHandle("__Luna.readToken", async () => {
+	try {
+		const content = await readFile(tokenFilePath, "utf8");
+		return JSON.parse(content);
+	} catch (err: any) {
+		if (err.code === "ENOENT") {
+			// File doesn't exist
+			return null;
+		}
+		throw err;
+	}
+});
+
+ipcHandle("__Luna.writeToken", async (_, tokenData: any) => {
+	await writeFile(tokenFilePath, JSON.stringify(tokenData, null, 2), "utf8");
+});
+// #endregion
 // #endregion
